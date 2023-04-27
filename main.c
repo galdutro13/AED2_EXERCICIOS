@@ -128,6 +128,9 @@ void novaAresta(Vertices* lista, int head, int adj){
 Vertices* copia(Vertices* g){
     Vertices* copia = inicializa();
 
+    for(int n = 0; n < tamanho; n++)
+        copia->inicio[n] = *criaNO(n);
+
     for(int i = 0; i < tamanho; i++){
         NO* head = &g->inicio[i];
         NO* adj = head->prox;
@@ -144,6 +147,9 @@ Vertices* copia(Vertices* g){
 Vertices* transposta(Vertices* g){
     Vertices* transp = inicializa();
 
+    for(int n = 0; n < tamanho; n++)
+        transp->inicio[n] = *criaNO(n);
+
     for(int i = 0; i < tamanho; i++){
         NO* head = &g->inicio[i];
 
@@ -158,22 +164,25 @@ Vertices* transposta(Vertices* g){
 
     return transp;
 }
-
-int countLoops(Vertices* g, int v){
+//TODO: adicionar um timer e guardar o tempo de descoberta de cada vertice em DIST
+//USAR ISSO PARA DETERMINAR SE O LOOP JÁ FOI DESCOBERTO OU NÃO.
+//LINK: https://www.codingninjas.com/codestudio/library/count-of-simple-cycles-in-a-connected-undirected-graph-having-n-vertices
+int countLoops(Vertices* g, int v, int timer){
     int count = 0;
     g->FLAG[v] = 1;
+    g->DIST[v] = timer;
+    timer++;
 
     NO* p = &g->inicio[v];
     while(p){
         if(p->prox && g->FLAG[p->prox->val] == 0){
-            return count + countLoops(g, p->prox->val);
+            return count + countLoops(g, p->prox->val, timer);
         }
-        else if(p->prox && g->FLAG[p->prox->val] == 1){
+        else if(p->prox && g->DIST[p->prox->val] < g->DIST[v]){
             g->FLAG[v] = 2;
             return 1;
         }
         p = p->prox;
-        //p++; ???
     }
 
     return count;
@@ -199,7 +208,8 @@ int main() {
     novaAresta(listadj, 2, 3);
 
 
-    printf("%d\n", countLoops(listadj, 0));
+    printf("%d\n", countLoops(listadj, 0, 0));
+    Vertices* transp = transposta(listadj);
 
     return 0;
 }
