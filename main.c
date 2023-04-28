@@ -227,6 +227,44 @@ int destroyLoops(Vertices* g, int v, int timer){
     return count;
 }
 
+bool isEnraizada(Vertices* g){
+    int incidencia[tamanho];
+    int num_raiz = 0;
+
+    for(int k = 0; k < tamanho; k++)
+        incidencia[k] = 0;
+
+    int i, j;
+    for(i = 0; i < tamanho; i++){
+        NO* p = &g->inicio[i];
+        int head = p->val;
+        for(j = 0; j < tamanho; j++){
+            NO* q = &g->inicio[j];
+            if(q->prox)
+                q = q->prox;
+
+            while(q){
+                if(q->val == head)
+                    incidencia[i] += 1;
+                q = q->prox;
+            }
+        }
+    }
+
+    for(int k = 0; k < tamanho; k++)
+        if(incidencia[k] == 0)
+            num_raiz++;
+
+    if(num_raiz != 1)
+        return false;
+
+    for(int k = 0; k < tamanho; k++)
+        if(incidencia[k] == 0 && countLoops(g, k, 0) == 0)
+            return true;
+
+    return false;
+}
+
 int main() {
     Vertices* listadj = inicializa();
 
