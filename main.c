@@ -124,6 +124,23 @@ void novaAresta(Vertices* lista, int head, int adj){
     exit(1);
 }
 
+void destroyAresta(Vertices* lista, int head, int adj){
+    if(existeAresta(lista, &lista->inicio[head], &lista->inicio[adj])){
+
+        NO* p = &lista->inicio[head];
+
+        while(p->prox){
+            if(p->prox->val == adj){
+                NO* temp = p->prox;
+                p->prox = p->prox->prox;
+                free(temp);
+                return;
+            }
+            p = p->prox;
+        }
+    }
+}
+
 
 Vertices* copia(Vertices* g){
     Vertices* copia = inicializa();
@@ -178,8 +195,30 @@ int countLoops(Vertices* g, int v, int timer){
         if(p->prox && g->FLAG[p->prox->val] == 0){
             return count + countLoops(g, p->prox->val, timer);
         }
-        else if(p->prox && g->DIST[p->prox->val] < g->DIST[v]){
+        else if(p != p->prox && g->DIST[p->prox->val] < g->DIST[v]){
             g->FLAG[v] = 2;
+            return 1;
+        }
+        p = p->prox;
+    }
+
+    return count;
+}
+
+int destroyLoops(Vertices* g, int v, int timer){
+    int count = 0;
+    g->FLAG[v] = 1;
+    g->DIST[v] = timer;
+    timer++;
+
+    NO* p = &g->inicio[v];
+    while(p){
+        if(p->prox && g->FLAG[p->prox->val] == 0){
+            return count + countLoops(g, p->prox->val, timer);
+        }
+        else if(p != p->prox && g->DIST[p->prox->val] < g->DIST[v]){
+            g->FLAG[v] = 2;
+            destroyAresta(g, p->val, p->prox->val);
             return 1;
         }
         p = p->prox;
