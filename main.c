@@ -141,7 +141,12 @@ void destroyAresta(Vertices* lista, int head, int adj){
     }
 }
 
-
+void reset_metadata(Vertices* g){
+    for(int k = 0; k < tamanho; k++){
+        g->FLAG[k] = 0;
+        g->DIST[k] = 0;
+    }
+}
 Vertices* copia(Vertices* g){
     Vertices* copia = inicializa();
 
@@ -195,7 +200,7 @@ int countLoops(Vertices* g, int v, int timer){
         if(p->prox && g->FLAG[p->prox->val] == 0){
             return count + countLoops(g, p->prox->val, timer);
         }
-        else if(p != p->prox && g->DIST[p->prox->val] < g->DIST[v]){
+        else if(p->prox && p != p->prox && g->DIST[p->prox->val] < g->DIST[v]){
             g->FLAG[v] = 2;
             return 1;
         }
@@ -228,6 +233,8 @@ int destroyLoops(Vertices* g, int v, int timer){
 }
 
 bool isEnraizada(Vertices* g){
+    bool is_enraizada = true;
+    bool isThere_loops = false;
     int incidencia[tamanho];
     int num_raiz = 0;
 
@@ -251,18 +258,23 @@ bool isEnraizada(Vertices* g){
         }
     }
 
-    for(int k = 0; k < tamanho; k++)
-        if(incidencia[k] == 0)
+    reset_metadata(g);
+    for(int k = 0; k < tamanho; k++) {
+        int LOOP_COUNT = countLoops(g, k, 0);
+        if (incidencia[k] == 0)
             num_raiz++;
+        if(LOOP_COUNT != 0 && !isThere_loops)
+            isThere_loops = true;
+        reset_metadata(g);
+    }
 
     if(num_raiz != 1)
-        return false;
+        is_enraizada = false;
 
-    for(int k = 0; k < tamanho; k++)
-        if(incidencia[k] == 0 && countLoops(g, k, 0) == 0)
-            return true;
+    if(!isThere_loops && is_enraizada)
+        return true;
+    else return false;
 
-    return false;
 }
 
 int main() {
@@ -276,17 +288,25 @@ int main() {
 
     novaAresta(listadj, 0, 1);
     novaAresta(listadj, 0, 2);
-    novaAresta(listadj, 1, 2);
 
-    novaAresta(listadj, 3, 4);
-    novaAresta(listadj, 3, 5);
-    novaAresta(listadj, 4, 2);
-    novaAresta(listadj, 4, 0);
+    novaAresta(listadj, 1, 3);
     novaAresta(listadj, 2, 3);
+    novaAresta(listadj, 2, 4);
 
+    novaAresta(listadj, 3, 5);
+    novaAresta(listadj, 4, 7);
+
+    novaAresta(listadj, 5, 6);
+
+    novaAresta(listadj, 6, 7);
+    novaAresta(listadj, 7, 3);
 
     printf("%d\n", countLoops(listadj, 0, 0));
-    Vertices* transp = transposta(listadj);
+    //Vertices* transp = transposta(listadj);
 
+    bool is_enraizada = isEnraizada(listadj);
+    if(is_enraizada)
+        printf("Grafo e uma arvore enraizada!\n");
+    else printf("NÃO: Grafo não e uma arvore enraizada!\n");
     return 0;
 }
