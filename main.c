@@ -1,20 +1,8 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#include "grafo_datastruct.h"
 
-#define tamanho 8
 
-typedef struct no{
-    int val;
-    struct no* prox;
-}NO;
 
-typedef struct {
-    NO* inicio;
-    int* FLAG;
-    int* DIST;
-    int* VIA;
-} Vertices;
 
 Vertices* inicializa(){
 
