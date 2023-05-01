@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "grafo_datastruct.h"
-
+#include "busca_emLargura.h"
 
 
 
@@ -296,5 +296,7 @@ int main() {
     if(is_enraizada)
         printf("Grafo e uma arvore enraizada!\n");
     else printf("NÃO: Grafo não e uma arvore enraizada!\n");
+
+    listadj = buscaEmLargura(listadj, 0, 0);
     return 0;
 }
