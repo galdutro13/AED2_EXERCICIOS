@@ -33,6 +33,6 @@ Vertices* buscaEmLargura(Vertices* g, int v, int timer){
     for(int i = 0; i < tamanho; i++)
         g->FLAG[i] = 0;
 
-    bfs(g, v, queue);
+    return bfs(g, v, queue);
 
 }

@@ -177,7 +177,7 @@ Vertices* transposta(Vertices* g){
 //TODO: adicionar um timer e guardar o tempo de descoberta de cada vertice em DIST
 //USAR ISSO PARA DETERMINAR SE O LOOP JÁ FOI DESCOBERTO OU NÃO.
 //LINK: https://www.codingninjas.com/codestudio/library/count-of-simple-cycles-in-a-connected-undirected-graph-having-n-vertices
-int countLoops(Vertices* g, int v, int* timer){
+int countLoops(Vertices* g, int v, int* timer) {
     int count = 0;
     g->FLAG[v] = 1;
     g->DIST[v] = *timer;
@@ -185,11 +185,11 @@ int countLoops(Vertices* g, int v, int* timer){
     *timer = *timer + 1;
 
     NO* p = &g->inicio[v];
-    while(p){
-        if(p->prox && g->FLAG[p->prox->val] == 0){
+    while (p) {
+        if (p->prox && g->FLAG[p->prox->val] == 0) {
             count = count + countLoops(g, p->prox->val, timer);
         }
-        else if(p->prox && g->DIST[p->prox->val] < g->DIST[v]){
+        else if (p->prox && g->FLAG[p->prox->val] == 1 && g->DIST[p->prox->val] < g->DIST[v]) {
             count = count + 1;
         }
         p = p->prox;
