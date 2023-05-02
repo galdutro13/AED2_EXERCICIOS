@@ -177,31 +177,31 @@ Vertices* transposta(Vertices* g){
 //TODO: adicionar um timer e guardar o tempo de descoberta de cada vertice em DIST
 //USAR ISSO PARA DETERMINAR SE O LOOP JÁ FOI DESCOBERTO OU NÃO.
 //LINK: https://www.codingninjas.com/codestudio/library/count-of-simple-cycles-in-a-connected-undirected-graph-having-n-vertices
-int countLoops(Vertices* g, int v, int timer){
+int countLoops(Vertices* g, int v, int* timer){
     int count = 0;
     g->FLAG[v] = 1;
-    g->DIST[v] = timer;
-    timer++;
+    g->DIST[v] = *timer;
+    g->VIA[*timer] = v;
+    *timer = *timer + 1;
 
     NO* p = &g->inicio[v];
     while(p){
         if(p->prox && g->FLAG[p->prox->val] == 0){
-            return count + countLoops(g, p->prox->val, timer);
+            count = count + countLoops(g, p->prox->val, timer);
         }
-        else if(p->prox && p != p->prox && g->DIST[p->prox->val] < g->DIST[v]){
-            g->FLAG[v] = 2;
-            return 1;
+        else if(p->prox && g->DIST[p->prox->val] < g->DIST[v]){
+            count = count + 1;
         }
         p = p->prox;
     }
-
+    g->FLAG[v] = 2;
     return count;
 }
 
-int destroyLoops(Vertices* g, int v, int timer){
+int destroyLoops(Vertices* g, int v, int* timer){
     int count = 0;
     g->FLAG[v] = 1;
-    g->DIST[v] = timer;
+    g->DIST[v] = *timer;
     timer++;
 
     NO* p = &g->inicio[v];
@@ -248,7 +248,8 @@ bool isEnraizada(Vertices* g){
 
     reset_metadata(g);
     for(int k = 0; k < tamanho; k++) {
-        int LOOP_COUNT = countLoops(g, k, 0);
+        int timer = 0;
+        int LOOP_COUNT = countLoops(g, k, &timer);
         if (incidencia[k] == 0)
             num_raiz++;
         if(LOOP_COUNT != 0 && !isThere_loops)
@@ -289,7 +290,12 @@ int main() {
     novaAresta(listadj, 6, 7);
     novaAresta(listadj, 7, 3);
 
-    printf("%d\n", countLoops(listadj, 0, 0));
+    novaAresta(listadj, 7, 8);
+    novaAresta(listadj, 8, 9);
+    novaAresta(listadj, 9, 4);
+
+    int timer = 0;
+    printf("%d\n", countLoops(listadj, 0, &timer));
     //Vertices* transp = transposta(listadj);
 
     bool is_enraizada = isEnraizada(listadj);
