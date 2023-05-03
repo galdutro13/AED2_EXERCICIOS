@@ -4,24 +4,27 @@
 
 #ifndef COUNTLOOPS_GRAFO_DATASTRUCT_H
 #define COUNTLOOPS_GRAFO_DATASTRUCT_H
+
 #include <stdlib.h>
 #include <stdbool.h>
 
 #define tamanho 8
 
-typedef struct no{
+typedef struct no {
     int val;
-    struct no* prox;
-}NO;
+    struct no *prox;
+} NO;
 
 typedef struct {
-    NO* inicio;
-    int* FLAG;
-    int* DIST;
-    int* VIA;
+    NO *inicio;
+    int *FLAG;
+    int *DIST;
+    int *VIA;
 } Vertices;
 
 
-Vertices* inicializa();
-void novaAresta(Vertices* lista, int head, int adj);
+Vertices *inicializa();
+
+void novaAresta(Vertices *lista, int head, int adj);
+
 #endif //COUNTLOOPS_GRAFO_DATASTRUCT_H
