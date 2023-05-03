@@ -146,15 +146,6 @@ void destroyAresta(Vertices *lista, int head, int adj) {
     }
 }
 
-int *extract_array(int *array) {
-    int *new_array = (int *) malloc(sizeof(int) * 8);
-
-    for (int i = 0; i < tamanho; i++) {
-        new_array[i] = array[i];
-    }
-    return new_array;
-}
-
 void reset_metadata(Vertices *g) {
     for (int k = 0; k < tamanho; k++) {
         g->FLAG[k] = 0;
@@ -312,7 +303,7 @@ void topologicalSort(Vertices *DAG) {
     Stack *in_degree_data = stack_init();
     reset_metadata(DAG);
 
-    int index = 0;
+    int index ;
     for (index = 0; index < tamanho; index++) {
         if (DAG->FLAG[index] == 0)
             topologicalSortUtil(DAG, index, in_degree_data);
@@ -325,7 +316,6 @@ void topologicalSort(Vertices *DAG) {
 }
 
 void destroyLoops(Vertices *g, int v, int *timer) {
-    int count = 0;
     g->FLAG[v] = 1;
     g->DIST[v] = *timer;
     (*timer)++;
@@ -426,7 +416,7 @@ int main() {
         printf("Grafo e uma arvore enraizada!\n");
     else printf("NÃO: Grafo não e uma arvore enraizada!\n");
 
-    listadj = buscaEmLargura(listadj, 0, 0);
+    listadj = buscaEmLargura(listadj, 0);
 
     int *componentes = Kosaraju(listadj);
     int index = 0;

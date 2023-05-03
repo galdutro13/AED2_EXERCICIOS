@@ -30,7 +30,7 @@ Vertices *bfs(Vertices *g, int v, GQUEUE *queue) {
     return g;
 }
 
-Vertices *buscaEmLargura(Vertices *g, int v, int timer) {
+Vertices *buscaEmLargura(Vertices *g, int v) {
     GQUEUE *queue = QUEUEinit(v);
     for (int i = 0; i < tamanho; i++)
         g->FLAG[i] = 0;

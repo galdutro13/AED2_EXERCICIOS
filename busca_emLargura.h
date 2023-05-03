@@ -7,6 +7,6 @@
 
 #include "grafo_datastruct.h"
 
-Vertices *buscaEmLargura(Vertices *g, int v, int timer);
+Vertices *buscaEmLargura(Vertices *g, int v);
 
 #endif //COUNTLOOPS_BUSCA_EMLARGURA_H
