@@ -128,12 +128,37 @@ void destroyAresta(Vertices* lista, int head, int adj){
         }
     }
 }
+int* extract_array(int* array) {
+    int* new_array = (int*) malloc(sizeof(int)*8);
 
+    for(int i = 0; i < tamanho; i++) {
+        new_array[i] = array[i];
+    }
+    return new_array;
+}
 void reset_metadata(Vertices* g){
     for(int k = 0; k < tamanho; k++){
         g->FLAG[k] = 0;
         g->DIST[k] = 0;
+        g->VIA[k] = 0;
     }
+}
+
+void print_grafo(Vertices* g) {
+    for(int i = 0; i < tamanho; i++) {
+        printf("Vertice %d", g->inicio[i].val);
+        NO* adj = &g->inicio[i];
+
+        adj = adj->prox;
+        while(adj != NULL) {
+
+            printf(" -> ");
+            printf("%d", adj->val);
+            adj = adj->prox;
+        }
+        printf("\n");
+    }
+    printf("\n");
 }
 Vertices* copia(Vertices* g){
     Vertices* copia = inicializa();
@@ -167,7 +192,7 @@ Vertices* transposta(Vertices* g){
             NO* adj = &g->inicio[j];
 
             if(existeAresta(g, head, adj)){
-                novaAresta(transp, adj->val, head->val);
+                novaAresta(transp, head->val, adj->val);
             }
         }
     }
@@ -196,6 +221,57 @@ int countLoops(Vertices* g, int v, int* timer) {
     }
     g->FLAG[v] = 2;
     return count;
+}
+void DFS1(Vertices* g, int v, int* timmer) {
+    g->FLAG[v] = 1;
+    NO* adj = &g->inicio[v];
+    while(adj != NULL) {
+        if(adj->prox && g->FLAG[adj->prox->val] == 0){
+            DFS1(g, adj->prox->val, timmer);
+        }
+        adj = adj->prox;
+    }
+    g->VIA[(*timmer)++] = v;
+}
+
+void DFS2(Vertices* g, int v, int* componente, int comp_index) {
+    g->FLAG[v] = 1;
+    componente[v] = comp_index;
+
+    NO* adj = &g->inicio[v];
+
+    while(adj != NULL){
+        if(adj->prox && g->FLAG[adj->prox->val] == 0){
+            DFS2(g, adj->prox->val, componente, comp_index);
+        }
+        adj = adj->prox;
+    }
+}
+
+int* Kosaraju(Vertices* g) {
+    reset_metadata(g);
+    int index = 0;
+
+    for(int i = 0; i < tamanho; i++) {
+        if(g->FLAG[i] == 0)
+            DFS1(g, i, &index);
+    }
+    //salvar as flags de visita
+    Vertices* transp = transposta(g);
+
+    int comp_index = 1;
+    int* componentes = (int*) malloc(sizeof(int)*tamanho);
+    while(index > 0){
+        int v = g->VIA[--index];
+        if(transp->FLAG[v] == 0){
+            DFS2(transp, v, componentes, comp_index);
+            for(int j = 0; j < tamanho; j++)
+                printf("Busca a partir de %d resultou nas descobertas do vertice %d marcado com %d\n", v, j, transp->FLAG[j]);
+            comp_index++;
+        }
+    }
+
+    return componentes;
 }
 
 int destroyLoops(Vertices* g, int v, int* timer){
@@ -274,25 +350,26 @@ int main() {
 
         listadj->inicio[i] = *criaNO(i);
     }
-
+    /* a<->h map 0<->7 */
     novaAresta(listadj, 0, 1);
-    novaAresta(listadj, 0, 2);
+    novaAresta(listadj, 1, 4);
+    novaAresta(listadj, 4, 0);
 
-    novaAresta(listadj, 1, 3);
+    novaAresta(listadj, 1, 2);
+
+    novaAresta(listadj, 1, 5);
+
     novaAresta(listadj, 2, 3);
-    novaAresta(listadj, 2, 4);
+    novaAresta(listadj, 3, 2);
 
-    novaAresta(listadj, 3, 5);
-    novaAresta(listadj, 4, 7);
+    novaAresta(listadj, 2, 6);
 
     novaAresta(listadj, 5, 6);
+    novaAresta(listadj, 6, 5);
+
+    novaAresta(listadj, 3, 7);
 
     novaAresta(listadj, 6, 7);
-    novaAresta(listadj, 7, 3);
-
-    novaAresta(listadj, 7, 8);
-    novaAresta(listadj, 8, 9);
-    novaAresta(listadj, 9, 4);
 
     int timer = 0;
     printf("%d\n", countLoops(listadj, 0, &timer));
@@ -304,5 +381,17 @@ int main() {
     else printf("NÃO: Grafo não e uma arvore enraizada!\n");
 
     listadj = buscaEmLargura(listadj, 0, 0);
+
+    int* componentes = Kosaraju(listadj);
+    int index = 0;
+    printf("\nGrafo inicial:\n");
+    print_grafo(listadj);
+    printf("\nGrafo transposto:\n");
+    print_grafo(transposta(listadj));
+    while(index < 8){
+        printf("Verdice de indice %d pretence ao componente: %d\n", listadj->inicio[index].val, *componentes);
+        componentes++;
+        index++;
+    }
     return 0;
 }

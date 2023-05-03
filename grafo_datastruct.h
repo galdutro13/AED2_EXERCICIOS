@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define tamanho 10
+#define tamanho 8
 
 typedef struct no{
     int val;
