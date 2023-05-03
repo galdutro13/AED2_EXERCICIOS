@@ -68,12 +68,10 @@ void addAresta(NO *head, NO *adj) {
 }
 
 bool arestaFinder(Vertices *g, NO *head, NO *adj) {
-    if (head && adj && !g->FLAG[adj->val]) {
+    if (head && adj) {
         if (head->val == adj->val) {
             return true;
         }
-
-        g->FLAG[adj->val] = 1;
         if (adj->prox)
             return arestaFinder(g, head, adj->prox);
 
@@ -82,14 +80,30 @@ bool arestaFinder(Vertices *g, NO *head, NO *adj) {
     return false;
 }
 
-bool existeAresta(Vertices *g, NO *head, NO *adj) {
-    bool retValue = arestaFinder(g, head, adj);
+bool explore_grafo(Vertices *g, NO *head, NO *adj) {
+    if (head && adj) {
+        if (head->val == adj->val) {
+            return true;
+        }
+        if (adj->prox)
+            return arestaFinder(g, head, &g->inicio[adj->prox->val]);
 
-    for (int i = 0; i < tamanho; i++) {
-        g->FLAG[i] = 0;
     }
 
-    return retValue;
+    return false;
+}
+
+bool existeAresta(Vertices *g, NO *head, NO *adj) {
+    if (head && adj) {
+        if (head->val == adj->val) {
+            return true;
+        }
+        if (adj->prox)
+            return existeAresta(g, head, adj->prox);
+
+    }
+
+    return false;
 }
 
 
@@ -97,6 +111,10 @@ void novaAresta(Vertices *lista, int head, int adj) {
     if (head < tamanho && adj < tamanho) {
         NO *headNO = &lista->inicio[head];
         NO *adjNO = criaNO(adj);
+
+        for (int i = 0; i < tamanho; i++) {
+            lista->FLAG[i] = 0;
+        }
 
         if (!existeAresta(lista, headNO, adjNO)) {
             addAresta(headNO, adjNO);
@@ -112,7 +130,7 @@ void novaAresta(Vertices *lista, int head, int adj) {
 }
 
 void destroyAresta(Vertices *lista, int head, int adj) {
-    if (existeAresta(lista, &lista->inicio[head], &lista->inicio[adj])) {
+    if (explore_grafo(lista, &lista->inicio[head], &lista->inicio[adj])) {
 
         NO *p = &lista->inicio[head];
 
@@ -282,25 +300,22 @@ void topologicalSortUtil(Vertices *g) {
 
 }
 
-int destroyLoops(Vertices *g, int v, int *timer) {
+void destroyLoops(Vertices *g, int v, int *timer) {
     int count = 0;
     g->FLAG[v] = 1;
     g->DIST[v] = *timer;
-    timer++;
+    (*timer)++;
 
     NO *p = &g->inicio[v];
     while (p) {
         if (p->prox && g->FLAG[p->prox->val] == 0) {
-            return count + countLoops(g, p->prox->val, timer);
-        } else if (p != p->prox && g->DIST[p->prox->val] < g->DIST[v]) {
+            destroyLoops(g, p->prox->val, timer);
+        } else if (p->prox && g->FLAG[p->prox->val] == 1 && g->DIST[p->prox->val] < g->DIST[v]) {
             g->FLAG[v] = 2;
             destroyAresta(g, p->val, p->prox->val);
-            return 1;
         }
         p = p->prox;
     }
-
-    return count;
 }
 
 bool isEnraizada(Vertices *g) {
@@ -392,9 +407,14 @@ int main() {
     int *componentes = Kosaraju(listadj);
     int index = 0;
     printf("\nGrafo inicial:\n");
-    print_grafo(listadj);
-    printf("\nGrafo transposto:\n");
-    print_grafo(transposta(listadj));
+
+    Vertices *no_more_loops = copia(listadj);
+    print_grafo(no_more_loops);
+
+    printf("\nGrafo sem loops:\n");
+    int reg = 0;
+    for (int l = 0; l < tamanho; l++) destroyLoops(no_more_loops, l, &reg);
+    print_grafo(no_more_loops);
     while (index < 8) {
         printf("Verdice de indice %d pretence ao componente: %d\n", listadj->inicio[index].val, *componentes);
         componentes++;
