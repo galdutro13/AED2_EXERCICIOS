@@ -296,7 +296,7 @@ int *Kosaraju(Vertices *g) {
     return componentes;
 }
 
-void topologicalSortUtil(Vertices *DAG, int v, Stack *in_degree){
+void topologicalSortUtil(Vertices *DAG, int v, Stack *in_degree) {
     DAG->FLAG[v] = 1;
     NO *adj = &DAG->inicio[v];
     while (adj != NULL) {
@@ -313,12 +313,12 @@ void topologicalSort(Vertices *DAG) {
     reset_metadata(DAG);
 
     int index = 0;
-    for(index = 0; index < tamanho; index++) {
-        if(DAG->FLAG[index] == 0)
+    for (index = 0; index < tamanho; index++) {
+        if (DAG->FLAG[index] == 0)
             topologicalSortUtil(DAG, index, in_degree_data);
     }
     index = 0;
-    while (stack_is_empty(in_degree_data) == false){
+    while (stack_is_empty(in_degree_data) == false) {
         DAG->VIA[index] = stack_pop(in_degree_data);
         index++;
     }
@@ -447,9 +447,9 @@ int main() {
 
     topologicalSort(no_more_loops);
     printf("\n");
-    for(int j = 0; j < tamanho; j++) {
+    for (int j = 0; j < tamanho; j++) {
         printf("%d", no_more_loops->VIA[j]);
-        if(j != tamanho - 1)
+        if (j != tamanho - 1)
             printf(" -> ");
     }
     return 0;

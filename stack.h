@@ -22,6 +22,4 @@ int stack_pop(Stack *stack);
 
 bool stack_is_empty(Stack *stack);
 
-bool stack_is_full(Stack *stack);
-
 #endif //COUNTLOOPS_STACK_H

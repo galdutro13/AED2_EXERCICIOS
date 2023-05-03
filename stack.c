@@ -41,9 +41,3 @@ bool stack_is_empty(Stack *stack) {
         return true;
     else return false;
 }
-
-bool stack_is_full(Stack *stack) {
-    if (stack->top == (tamanho - 1))
-        return true;
-    else return false;
-}
