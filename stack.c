@@ -5,7 +5,7 @@
 #include "stack.h"
 #include "grafo_datastruct.h"
 
-Stack *stacl_init() {
+Stack *stack_init() {
     Stack *new_stack = (Stack *) malloc(sizeof(Stack));
     int *data_structure = (int *) malloc(sizeof(int) * tamanho);
 
@@ -36,13 +36,13 @@ int stack_pop(Stack *stack) {
     return value;
 }
 
-inline bool stack_is_empty(Stack *stack) {
+bool stack_is_empty(Stack *stack) {
     if (stack->top == -1)
         return true;
     else return false;
 }
 
-inline bool stack_is_full(Stack *stack) {
+bool stack_is_full(Stack *stack) {
     if (stack->top == (tamanho - 1))
         return true;
     else return false;

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "grafo_datastruct.h"
 #include "busca_emLargura.h"
-
+#include "stack.h"
 
 Vertices *inicializa() {
 
@@ -296,8 +296,32 @@ int *Kosaraju(Vertices *g) {
     return componentes;
 }
 
-void topologicalSortUtil(Vertices *g) {
+void topologicalSortUtil(Vertices *DAG, int v, Stack *in_degree){
+    DAG->FLAG[v] = 1;
+    NO *adj = &DAG->inicio[v];
+    while (adj != NULL) {
+        if (adj->prox && DAG->FLAG[adj->prox->val] == 0) {
+            topologicalSortUtil(DAG, adj->prox->val, in_degree);
+        }
+        adj = adj->prox;
+    }
+    stack_push(in_degree, v);
+}
 
+void topologicalSort(Vertices *DAG) {
+    Stack *in_degree_data = stack_init();
+    reset_metadata(DAG);
+
+    int index = 0;
+    for(index = 0; index < tamanho; index++) {
+        if(DAG->FLAG[index] == 0)
+            topologicalSortUtil(DAG, index, in_degree_data);
+    }
+    index = 0;
+    while (stack_is_empty(in_degree_data) == false){
+        DAG->VIA[index] = stack_pop(in_degree_data);
+        index++;
+    }
 }
 
 void destroyLoops(Vertices *g, int v, int *timer) {
@@ -419,6 +443,14 @@ int main() {
         printf("Verdice de indice %d pretence ao componente: %d\n", listadj->inicio[index].val, *componentes);
         componentes++;
         index++;
+    }
+
+    topologicalSort(no_more_loops);
+    printf("\n");
+    for(int j = 0; j < tamanho; j++) {
+        printf("%d", no_more_loops->VIA[j]);
+        if(j != tamanho - 1)
+            printf(" -> ");
     }
     return 0;
 }
